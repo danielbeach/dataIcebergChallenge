@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contributor_name": "Daniel Beach",
+  "github_handle": "danielbeach",
+  "code_repository_url": "https://github.com/danielbeach/dataIcebergChallenge",
+  "run_date_utc": "2026-09-14",
+  "language": "Python 3.12.12",
+  "tool": "Polars (streaming engine)",
+  "tool_version": "1.44.2",
+  "execution_class": "single_node",
+  "node_count": 1,
+  "vcpu_per_node": 8,
+  "ram_gib_per_node": 24,
+  "compute_and_network": "Apple M4 Pro (14 cores; Polars pinned to POLARS_MAX_THREADS=8), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004",
+  "table_state": "Latest as of run date: metadata 00258-83455019-db09-4def-8eb2-640f5b222dd8.metadata.json, snapshot 8298869781046488555, sequence number 231, committed 2026-09-02T16:26:43Z; 627 data files across 159 monthly partitions",
+  "cache_state": "cold",
+  "command": "uv run results/danielbeach/bench_polars.py <query>.sql --mode cold",
+  "date_range": "01 and 02: 2024-12-31. 03: 2024-01-01 through 2024-12-31. 04 and 05: full table history, 2013-04 through 2026-06.",
+  "sql_changes": "Translated from DuckDB SQL to the Polars LazyFrame API and executed with collect(engine='streaming'); Polars SQL does not cover the unbounded SUM(COUNT(*)) OVER () of 02, the COUNT(DISTINCT CASE WHEN ...) of 03, or the interval arithmetic against a joined column of 04. Each translation preserves the query: 02 divides by the summed group count instead of a window, 03 counts distinct serial_number under a filter instead of a CASE, 04 uses dt.offset_by('-30d') for INTERVAL 30 DAY, and 05 uses a semi-join because month_end_date is unique per month and so DuckDB's inner join selects the same rows. All five produce values identical to my DuckDB 1.5.5 submission.",
+  "results": [
+    {
+      "query": "01_fleet_on_a_day.sql",
+      "status": "pass",
+      "runtime_ms": 7369.2,
+      "bytes_scanned": 7930880,
+      "files_scanned": 1,
+      "result_evidence": "1 row: 2024-12-31, 305180 active drives, 4.42 raw exabytes",
+      "notes": "Partition pruning leaves the single date_month=2024-12 data file of 241,657,332 bytes, from which only date and capacity_bytes are read. Every bytes_scanned figure in this record is measured at the network interface (psutil bytes_recv across the query, machine otherwise idle), so it is an upper bound that includes TLS and HTTP framing: Polars' native Iceberg reader exposes no per-query byte counter, unlike DuckDB's external file cache. Also unlike my DuckDB record, runtime_ms includes Iceberg metadata resolution, because Polars resolves the table inside collect() rather than in a separable setup step."
+    },
+    {
+      "query": "02_model_mix.sql",
+      "status": "pass",
+      "runtime_ms": 2919.8,
+      "bytes_scanned": 8205312,
+      "files_scanned": 1,
+      "result_evidence": "15 rows; top model TOSHIBA MG08ACA16TA with 40185 drives (13.17%), 15th TOSHIBA MG08ACA16TE with 5912 drives (1.94%)",
+      "notes": "Same single pruned data file as query 01, reading date and model. Faster than query 01 despite reading slightly more: query 01 was the first request of the session, so it carried DNS and TLS setup to the B2 endpoint. Both are dominated by request latency rather than bytes."
+    },
+    {
+      "query": "03_failure_rate_by_model.sql",
+      "status": "pass",
+      "runtime_ms": 26245.3,
+      "bytes_scanned": 1229798400,
+      "files_scanned": 12,
+      "result_evidence": "20 rows; highest annualized failure rate ST12000NM0007 at 11.387% (1169 drives, 125 failures), lowest of the 20 TOSHIBA MG08ACA16TE at 1.143%",
+      "notes": "The date predicate prunes to the 12 monthly partitions of 2024, 2,773,236,762 bytes of Parquet, of which the four projected columns pull 1.23 GB over the wire. serial_number dominates: two n_unique aggregations need every value."
+    },
+    {
+      "query": "04_smart_warning_signals.sql",
+      "status": "pass",
+      "runtime_ms": 253654.4,
+      "bytes_scanned": 1083113472,
+      "files_scanned": 627,
+      "result_evidence": "20 rows; highest avg pending sectors WDC WD1600BPVT at 16484.5 over 119 observations, ST14000NM0138 second at 4963.5 over 13765 observations",
+      "notes": "Whole-history query with no date predicate: the failed_drives side and the probe side each read all 627 data files, 26,196,746,019 bytes of Parquet in total. Projection pushdown keeps the wire cost to 1.08 GB across both scans; the failure=1 side reads only serial_number, date and failure."
+    },
+    {
+      "query": "05_capacity_growth.sql",
+      "status": "pass",
+      "runtime_ms": 54063.2,
+      "bytes_scanned": 414135296,
+      "files_scanned": 627,
+      "result_evidence": "159 rows, one per month-end from 2013-04-30 to 2026-06-30; first row 21734 drives / 0.06 EB / 0.0% at least 16 TB, last row 355238 drives / 5.71 EB / 60.18% at least 16 TB",
+      "notes": "Whole-history query projecting only date and capacity_bytes. The month_end side reads date alone. Wall time is dominated by per-file request latency across 627 remote files rather than bandwidth."
+    }
+  ]
+}

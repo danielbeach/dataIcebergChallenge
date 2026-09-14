@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contributor_name": "Daniel Beach",
+  "github_handle": "danielbeach",
+  "code_repository_url": "https://github.com/danielbeach/dataIcebergChallenge",
+  "run_date_utc": "2026-09-14",
+  "language": "Python 3.12.12",
+  "tool": "Polars (streaming engine)",
+  "tool_version": "1.44.2",
+  "execution_class": "single_node",
+  "node_count": 1,
+  "vcpu_per_node": 8,
+  "ram_gib_per_node": 24,
+  "compute_and_network": "Apple M4 Pro (14 cores; Polars pinned to POLARS_MAX_THREADS=8), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004",
+  "table_state": "Latest as of run date: metadata 00258-83455019-db09-4def-8eb2-640f5b222dd8.metadata.json, snapshot 8298869781046488555, sequence number 231, committed 2026-09-02T16:26:43Z; 627 data files across 159 monthly partitions",
+  "cache_state": "warm",
+  "command": "uv run results/danielbeach/bench_polars.py <query>.sql --mode warm --repeats 3 (--repeats 2 for query 04)",
+  "date_range": "01 and 02: 2024-12-31. 03: 2024-01-01 through 2024-12-31. 04 and 05: full table history, 2013-04 through 2026-06.",
+  "sql_changes": "Translated from DuckDB SQL to the Polars LazyFrame API and executed with collect(engine='streaming'); Polars SQL does not cover the unbounded SUM(COUNT(*)) OVER () of 02, the COUNT(DISTINCT CASE WHEN ...) of 03, or the interval arithmetic against a joined column of 04. Each translation preserves the query: 02 divides by the summed group count instead of a window, 03 counts distinct serial_number under a filter instead of a CASE, 04 uses dt.offset_by('-30d') for INTERVAL 30 DAY, and 05 uses a semi-join because month_end_date is unique per month and so DuckDB's inner join selects the same rows. All five produce values identical to my DuckDB 1.5.5 submission.",
+  "results": [
+    {
+      "query": "01_fleet_on_a_day.sql",
+      "status": "pass",
+      "runtime_ms": 251.3,
+      "bytes_scanned": null,
+      "files_scanned": 1,
+      "result_evidence": "1 row: 2024-12-31, 305180 active drives, 4.42 raw exabytes",
+      "notes": "Fastest of 3 executions after one discarded priming run; samples 324.5 / 357.2 / 251.3 ms. 29x faster than the cold run: the single pruned data file is small enough that its projected column chunks stay resident in the process. bytes_scanned is null because the warm measurement covers four executions at once; the interface counter recorded 10,112,000 bytes across all four, against 7,930,880 for the one cold execution, so re-execution was nearly free here."
+    },
+    {
+      "query": "02_model_mix.sql",
+      "status": "pass",
+      "runtime_ms": 290.8,
+      "bytes_scanned": null,
+      "files_scanned": 1,
+      "result_evidence": "15 rows; top model TOSHIBA MG08ACA16TA with 40185 drives (13.17%), 15th TOSHIBA MG08ACA16TE with 5912 drives (1.94%)",
+      "notes": "Fastest of 3 executions after one discarded priming run; samples 361.0 / 436.4 / 290.8 ms. 10x faster than cold, for the same reason as query 01: 11,710,464 interface bytes across all four executions against 8,205,312 for the single cold one."
+    },
+    {
+      "query": "03_failure_rate_by_model.sql",
+      "status": "pass",
+      "runtime_ms": 18856.2,
+      "bytes_scanned": null,
+      "files_scanned": 12,
+      "result_evidence": "20 rows; highest annualized failure rate ST12000NM0007 at 11.387% (1169 drives, 125 failures), lowest of the 20 TOSHIBA MG08ACA16TE at 1.143%",
+      "notes": "Fastest of 3 executions after one discarded priming run; samples 20388.7 / 18856.2 / 20353.8 ms. Only 1.4x faster than cold. The interface counter recorded 3,529,698,304 bytes across four executions, roughly 882 MB each against 1,229,798,400 for the cold one, so Polars re-fetched the column chunks every time and kept only metadata and footers."
+    },
+    {
+      "query": "04_smart_warning_signals.sql",
+      "status": "pass",
+      "runtime_ms": 259523.9,
+      "bytes_scanned": null,
+      "files_scanned": 627,
+      "result_evidence": "20 rows; highest avg pending sectors WDC WD1600BPVT at 16484.5 over 119 observations, ST14000NM0138 second at 4963.5 over 13765 observations",
+      "notes": "Fastest of 2 executions after one discarded priming run; samples 259523.9 / 272388.4 ms. No faster than the 253654.4 ms cold run: 3,295,994,880 interface bytes across three executions is about 1.10 GB each, matching the cold run's 1,083,113,472, so every execution re-read the table from B2. Polars 1.44.2 has no equivalent of DuckDB's external file cache, which is why my DuckDB record shows 8.09 s here and this one does not."
+    },
+    {
+      "query": "05_capacity_growth.sql",
+      "status": "pass",
+      "runtime_ms": 40442.1,
+      "bytes_scanned": null,
+      "files_scanned": 627,
+      "result_evidence": "159 rows, one per month-end from 2013-04-30 to 2026-06-30; first row 21734 drives / 0.06 EB / 0.0% at least 16 TB, last row 355238 drives / 5.71 EB / 60.18% at least 16 TB",
+      "notes": "Fastest of 3 executions after one discarded priming run; samples 44304.0 / 40442.1 / 55145.0 ms. Only 1.3x faster than cold, and the spread across samples is wider than the gain, which points at object-store request latency rather than cache state. 1,237,907,456 interface bytes across four executions is about 309 MB each against 414,135,296 cold."
+    }
+  ]
+}
