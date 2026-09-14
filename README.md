@@ -1,72 +1,91 @@
 # Backblaze Drive Stats Iceberg Challenge
 
 **Can your data engine query a half-billion-row Iceberg table efficiently?**
-Choose your language and tool, solve five Drive Stats analytics challenges, and
+Pick your language and engine, solve five Drive Stats analytics challenges, and
 submit reproducible results to the community leaderboard.
 
 ![Backblaze Drive Stats Iceberg Challenge](dec.jpg)
 
 **Sponsored by [Data Engineering Central](https://dataengineeringcentral.substack.com/).**
 
-Build a data-engineering portfolio project from Backblaze's public, read-only
+Build a data-engineering portfolio project on Backblaze's public, read-only
 [Drive Stats](https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data)
 Iceberg table. Each row is one operational-drive snapshot for one day, including
 drive identity, capacity, failure status, and S.M.A.R.T. attributes.
 
-This is deliberately a **bring-your-own-language and bring-your-own-engine**
-challenge. The five SQL files in [`queries/`](queries) define the questions,
-not the implementation. Use Rust, Python, Java, Scala, Go, JavaScript,
-SQL, or another language; use DuckDB, Polars, DataFusion, PyIceberg, Trino,
-Spark, Snowflake, or any compatible tool. Reproduce the queries, then improve
-them for cost, partition pruning, schema evolution, and reproducibility.
+This is deliberately a **bring-your-own-language, bring-your-own-engine**
+challenge. The five SQL files in [`queries/`](queries) define the questions, not
+the implementation. Use Rust, Python, Java, Scala, Go, JavaScript, SQL, or
+anything else; use DuckDB, Polars, DataFusion, PyIceberg, Trino, Spark,
+Snowflake, or any compatible engine. Reproduce the queries, then improve them
+for cost, partition pruning, schema evolution, and reproducibility.
 
-## Choose your challenge track
+## Contents
 
-Submit to one track only. The leaderboard does not compare these tracks because
-they have fundamentally different execution resources.
+- [Choose your track](#choose-your-track)
+- [Current leaderboard](#current-leaderboard)
+- [Dataset facts](#dataset-facts)
+- [Quick start: Python + DuckDB](#quick-start-python--duckdb)
+- [The five challenges](#the-five-challenges)
+- [Use your preferred stack](#use-your-preferred-stack)
+- [Submit your results](#submit-your-results)
+- [Submission rules](#submission-rules)
+- [Suggested extensions](#suggested-extensions)
+
+## Choose your track
+
+Submit to one track only. The leaderboard does not compare tracks against each
+other, because they have fundamentally different execution resources.
 
 | Track | Use this track when | Maximum resources |
 |---|---|---|
-| **Single-Node** | Your engine runs on one machine, including local multi-process execution. | 1 node; 8 vCPU; 32 GiB RAM |
+| **Single-node** | Your engine runs on one machine, including local multi-process execution. | 1 node; 8 vCPU; 32 GiB RAM |
 | **Distributed** | Your engine distributes the query across a cluster. | 2–4 nodes; each node at most 8 vCPU and 32 GiB RAM |
+
+Your submitted record must state the actual node count, vCPU per node, and GiB
+RAM per node; those specs appear on every leaderboard row. A multi-process
+engine on one machine is single-node.
 
 ## Current leaderboard
 
-<!-- leaderboard:start -->
-> Results are contributor-reported, not controlled benchmarks. Report links identify the contributor and link their public GitHub code repository, with hardware, network, cache state, table state, and query translation details.
+Also published standalone as [`LEADERBOARD.md`](LEADERBOARD.md). Both are
+generated from the submitted JSON records — see
+[Submit your results](#submit-your-results).
 
+<!-- leaderboard:start -->
+> Results are contributor-reported, not controlled benchmarks. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
 
 ### Single-node engines (max: 8 vCPU / 32 GiB RAM)
 
 #### Fastest cold runs
 
-| Query | Runtime | Tool / report | Code |
-|---|---:|---|---|
-| `01_fleet_on_a_day.sql` | — | No submitted cold run | — |
-| `02_model_mix.sql` | — | No submitted cold run | — |
-| `03_failure_rate_by_model.sql` | — | No submitted cold run | — |
-| `04_smart_warning_signals.sql` | — | No submitted cold run | — |
-| `05_capacity_growth.sql` | — | No submitted cold run | — |
+| Query | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | No submitted cold run | — |
+| `02_model_mix.sql` | — | — | — | No submitted cold run | — |
+| `03_failure_rate_by_model.sql` | — | — | — | No submitted cold run | — |
+| `04_smart_warning_signals.sql` | — | — | — | No submitted cold run | — |
+| `05_capacity_growth.sql` | — | — | — | No submitted cold run | — |
 
 #### Fastest warm runs
 
-| Query | Runtime | Tool / report | Code |
-|---|---:|---|---|
-| `01_fleet_on_a_day.sql` | — | No submitted warm run | — |
-| `02_model_mix.sql` | — | No submitted warm run | — |
-| `03_failure_rate_by_model.sql` | — | No submitted warm run | — |
-| `04_smart_warning_signals.sql` | — | No submitted warm run | — |
-| `05_capacity_growth.sql` | — | No submitted warm run | — |
+| Query | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | No submitted warm run | — |
+| `02_model_mix.sql` | — | — | — | No submitted warm run | — |
+| `03_failure_rate_by_model.sql` | — | — | — | No submitted warm run | — |
+| `04_smart_warning_signals.sql` | — | — | — | No submitted warm run | — |
+| `05_capacity_growth.sql` | — | — | — | No submitted warm run | — |
 
 #### Lowest reported bytes read
 
-| Query | Bytes read | Tool / report | Code |
-|---|---:|---|---|
-| `01_fleet_on_a_day.sql` | — | No submitted scan metric | — |
-| `02_model_mix.sql` | — | No submitted scan metric | — |
-| `03_failure_rate_by_model.sql` | — | No submitted scan metric | — |
-| `04_smart_warning_signals.sql` | — | No submitted scan metric | — |
-| `05_capacity_growth.sql` | — | No submitted scan metric | — |
+| Query | Bytes read | Contributor | Specs | Tool / report | Code |
+|---|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | No submitted scan metric | — |
+| `02_model_mix.sql` | — | — | — | No submitted scan metric | — |
+| `03_failure_rate_by_model.sql` | — | — | — | No submitted scan metric | — |
+| `04_smart_warning_signals.sql` | — | — | — | No submitted scan metric | — |
+| `05_capacity_growth.sql` | — | — | — | No submitted scan metric | — |
 
 #### Completed all five queries
 
@@ -76,33 +95,33 @@ No submission has completed all five queries yet.
 
 #### Fastest cold runs
 
-| Query | Runtime | Tool / report | Code |
-|---|---:|---|---|
-| `01_fleet_on_a_day.sql` | — | No submitted cold run | — |
-| `02_model_mix.sql` | — | No submitted cold run | — |
-| `03_failure_rate_by_model.sql` | — | No submitted cold run | — |
-| `04_smart_warning_signals.sql` | — | No submitted cold run | — |
-| `05_capacity_growth.sql` | — | No submitted cold run | — |
+| Query | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | No submitted cold run | — |
+| `02_model_mix.sql` | — | — | — | No submitted cold run | — |
+| `03_failure_rate_by_model.sql` | — | — | — | No submitted cold run | — |
+| `04_smart_warning_signals.sql` | — | — | — | No submitted cold run | — |
+| `05_capacity_growth.sql` | — | — | — | No submitted cold run | — |
 
 #### Fastest warm runs
 
-| Query | Runtime | Tool / report | Code |
-|---|---:|---|---|
-| `01_fleet_on_a_day.sql` | — | No submitted warm run | — |
-| `02_model_mix.sql` | — | No submitted warm run | — |
-| `03_failure_rate_by_model.sql` | — | No submitted warm run | — |
-| `04_smart_warning_signals.sql` | — | No submitted warm run | — |
-| `05_capacity_growth.sql` | — | No submitted warm run | — |
+| Query | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | No submitted warm run | — |
+| `02_model_mix.sql` | — | — | — | No submitted warm run | — |
+| `03_failure_rate_by_model.sql` | — | — | — | No submitted warm run | — |
+| `04_smart_warning_signals.sql` | — | — | — | No submitted warm run | — |
+| `05_capacity_growth.sql` | — | — | — | No submitted warm run | — |
 
 #### Lowest reported bytes read
 
-| Query | Bytes read | Tool / report | Code |
-|---|---:|---|---|
-| `01_fleet_on_a_day.sql` | — | No submitted scan metric | — |
-| `02_model_mix.sql` | — | No submitted scan metric | — |
-| `03_failure_rate_by_model.sql` | — | No submitted scan metric | — |
-| `04_smart_warning_signals.sql` | — | No submitted scan metric | — |
-| `05_capacity_growth.sql` | — | No submitted scan metric | — |
+| Query | Bytes read | Contributor | Specs | Tool / report | Code |
+|---|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | No submitted scan metric | — |
+| `02_model_mix.sql` | — | — | — | No submitted scan metric | — |
+| `03_failure_rate_by_model.sql` | — | — | — | No submitted scan metric | — |
+| `04_smart_warning_signals.sql` | — | — | — | No submitted scan metric | — |
+| `05_capacity_growth.sql` | — | — | — | No submitted scan metric | — |
 
 #### Completed all five queries
 
@@ -123,15 +142,16 @@ No submission has completed all five queries yet.
 Schema changes can occur quarterly. Do not hard-code a CSV-era schema: inspect
 the Iceberg schema before building a production-quality solution.
 
-## Included quick start: Python + DuckDB
+## Quick start: Python + DuckDB
 
 This runnable path is a convenience, not a requirement. It gives newcomers a
 small, reproducible starting point; submissions may use any stack.
 
 1. Install [uv](https://docs.astral.sh/uv/), then run `uv sync`.
-2. Copy `.env.example` to `.env`.
-3. Populate the first two variables using the **published read-only credentials**
-   on Backblaze's Drive Stats page. `.env` is ignored and must not be committed.
+2. Copy [`.env.example`](.env.example) to `.env`.
+3. Fill in the two credential variables using the **published read-only
+   credentials** on Backblaze's Drive Stats page. `.env` is gitignored and must
+   not be committed.
 4. Run a query:
 
    ```bash
@@ -139,18 +159,18 @@ small, reproducible starting point; submissions may use any stack.
    ```
 
 The command installs DuckDB's `httpfs` and `iceberg` extensions, configures an
-S3 secret only in the local process, enables DuckDB's metadata version discovery,
-and creates a `drivestats` view. It does not copy the table locally.
+S3 secret only in the local process, enables DuckDB's metadata version
+discovery, and creates a `drivestats` view. It does not copy the table locally.
 
-## Five challenges
+## The five challenges
 
 | Query | Theme | Skills exercised |
 |---|---|---|
-| `01_fleet_on_a_day.sql` | Daily fleet baseline | Date predicates, capacity aggregation |
-| `02_model_mix.sql` | Fleet composition | Windows and percentage calculations |
-| `03_failure_rate_by_model.sql` | Reliability comparison | Drive-days, distinct failures, annualization |
-| `04_smart_warning_signals.sql` | Pre-failure SMART behavior | Self-join, time windows, null handling |
-| `05_capacity_growth.sql` | Fleet evolution | Monthly snapshots, scale, capacity mix |
+| [`01_fleet_on_a_day.sql`](queries/01_fleet_on_a_day.sql) | Daily fleet baseline | Date predicates, capacity aggregation |
+| [`02_model_mix.sql`](queries/02_model_mix.sql) | Fleet composition | Windows and percentage calculations |
+| [`03_failure_rate_by_model.sql`](queries/03_failure_rate_by_model.sql) | Reliability comparison | Drive-days, distinct failures, annualization |
+| [`04_smart_warning_signals.sql`](queries/04_smart_warning_signals.sql) | Pre-failure SMART behavior | Self-join, time windows, null handling |
+| [`05_capacity_growth.sql`](queries/05_capacity_growth.sql) | Fleet evolution | Monthly snapshots, scale, capacity mix |
 
 Queries intentionally use a recent historical date where appropriate, rather
 than assuming today's partitions are available. Begin with one-month or
@@ -158,10 +178,10 @@ one-year predicates before attempting table-wide exploration.
 
 ## Use your preferred stack
 
-The table URI, B2 endpoint, region, and published read-only credentials are
-the only common connection inputs. The challenge queries are written in
-portable analytical SQL, but small dialect adjustments are expected and should
-be recorded in your submission.
+The table URI, B2 endpoint, region, and published read-only credentials are the
+only common connection inputs. The challenge queries are written in portable
+analytical SQL, but small dialect adjustments are expected and must be recorded
+in your submission.
 
 | Tool | Recommended approach |
 |---|---|
@@ -171,58 +191,55 @@ be recorded in your submission.
 | Apache DataFusion / Rust | Configure an S3 object store and its Iceberg catalog/table provider; query through DataFusion SQL or the Rust API. |
 | Trino | Configure the Iceberg connector and native S3 filesystem, then register the object-store table in a metastore. |
 | Spark | Configure `SparkCatalog`/Hadoop S3A for B2 and register the existing table metadata. |
-| Java, Scala, Go, JavaScript, or other runtimes | Use an Iceberg-compatible client or connect to a query engine that supports the S3-compatible B2 endpoint. |
+| Java, Scala, Go, JavaScript, other runtimes | Use an Iceberg-compatible client, or connect to a query engine that supports the S3-compatible B2 endpoint. |
 
 The source article includes complete DuckDB, Trino, and Snowflake examples:
 [Iceberg on Backblaze B2](https://www.backblaze.com/blog/iceberg-on-backblaze-b2/).
 Use the current metadata rather than pinning the article's historical metadata
 filename.
 
-## Share your results by pull request
+## Submit your results
 
-Benchmarking across runtimes is part of the challenge. Fork this repository,
-run one or more queries, and open a PR adding one report under
-[`results/`](results). Start by copying both
-[`results/TEMPLATE.md`](results/TEMPLATE.md) and
-[`results/TEMPLATE.json`](results/TEMPLATE.json) to
+Benchmarking across runtimes is part of the challenge. Fork this repository, run
+one or more queries, and open a PR adding one report under
+[`results/`](results). Copy both [`results/TEMPLATE.md`](results/TEMPLATE.md)
+and [`results/TEMPLATE.json`](results/TEMPLATE.json) to
 `results/<your-github-handle>/<tool>-<version>.<md|json>`.
 
-Each report must record one result row for every query it ran: query filename,
-success/failure, runtime, result row count or result values, and scan
-bytes/files when the tool exposes them. Also include the contributor's display
-name and GitHub handle, a public GitHub repository URL containing the runnable
-code, language, tool and version, OS/compute details, table snapshot or run
-timestamp, date range, command, and any SQL dialect changes. Markdown is for
-people; the paired JSON record is the source for the generated leaderboard. The
-[pull request template](.github/pull_request_template.md) turns these into a
-review checklist.
+The JSON is the machine-readable source for the leaderboard; the Markdown
+explains the result to readers. Every record must carry:
 
-Results are not a cross-engine performance leaderboard: network location,
-object-store caching, hardware, concurrency, and metadata version affect
-runtime. Publish enough context for readers to reproduce and interpret the
-number rather than comparing a single runtime in isolation.
+- **Contributor identity** — display name and GitHub handle.
+- **Specs** — `execution_class`, node count, vCPU and RAM per node, plus CPU
+  model and general location. These are shown directly on the leaderboard.
+- **Code** — a public GitHub repository URL containing the runnable code.
+- **Run context** — language, tool and version, table snapshot or run
+  timestamp, cache state, date range, exact command, and any SQL dialect
+  changes.
+- **One result object per query** — filename, `pass`/`fail`/`not_run`, runtime,
+  result row count or values, and scanned bytes/files when the tool reports
+  them. Partial reports are welcome, but mark unrun queries `not_run` rather
+  than omitting them.
 
-## Leaderboard
+Validate and regenerate before opening the PR:
 
-[`LEADERBOARD.md`](LEADERBOARD.md) is rebuilt automatically when a results PR
-is merged. It separates engines running on one machine from distributed
-engines, then lists community-reported leaders for fastest cold run, fastest
-warm run, lowest bytes read, and completing all five queries. Every entry links
-to its submitted report, so runtime claims retain their context.
+```bash
+uv run python scripts/validate_results.py
+uv run python scripts/generate_leaderboard.py
+```
 
-| Class | Maximum resources |
-|---|---|
-| Single node | 1 node; 8 vCPU; 32 GiB RAM |
-| Distributed | 2–4 nodes; each node at most 8 vCPU and 32 GiB RAM |
+The generator rewrites `LEADERBOARD.md` and the leaderboard block in this
+README from the submitted records, so commit both. It separates single-node
+from distributed engines, then lists leaders for fastest cold run, fastest warm
+run, lowest bytes read, and completing all five queries. Records above the
+resource ceiling for their class are rejected.
 
-The submitted record must state actual node count, vCPU per node, and GiB RAM
-per node. A multi-process engine operating on one machine is single-node.
-
-Pull-request automation only validates submitted JSON and Markdown; it does not
-run submitted code, access the Drive Stats dataset, or expose credentials.
-Entries are community-reported. The automation validates the structured JSON
-and requires its matching Markdown report; reviewers assess the contextual
-claims in the report.
+Validation checks the structured JSON and requires a matching Markdown report.
+It does not run submitted code, access the Drive Stats dataset, or handle
+credentials — reviewers assess the contextual claims in the report. Results are
+not a controlled cross-engine benchmark: network location, object-store
+caching, hardware, concurrency, and metadata version all affect runtime.
+Publish enough context for readers to reproduce and interpret the number.
 
 ## Submission rules
 
@@ -233,7 +250,7 @@ claims in the report.
    and date range for every result.
 4. Include only source code, configuration with secrets removed, and concise
    textual or tabular result evidence; do not commit result data extracts.
-5. Stay within the resource ceiling for the selected leaderboard class.
+5. Stay within the resource ceiling for your chosen track.
 6. Explain how Iceberg metadata and date predicates reduce object-store reads.
 
 ## Suggested extensions

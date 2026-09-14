@@ -1,4 +1,9 @@
-"""Generate the checked-in community-reported results leaderboard."""
+"""Generate the checked-in community-reported results leaderboard.
+
+Writes the standalone `LEADERBOARD.md` and mirrors the same tables into the
+`<!-- leaderboard:start -->` / `<!-- leaderboard:end -->` block in `README.md`,
+so the two can never drift.
+"""
 
 from __future__ import annotations
 
@@ -13,12 +18,40 @@ README_PATH = Path("README.md")
 README_START_MARKER = "<!-- leaderboard:start -->"
 README_END_MARKER = "<!-- leaderboard:end -->"
 
+RUNTIME_HEADER = (
+    "| Query | Runtime | Contributor | Specs | Tool / report | Code |",
+    "|---|---:|---|---|---|---|",
+)
+BYTES_HEADER = (
+    "| Query | Bytes read | Contributor | Specs | Tool / report | Code |",
+    "|---|---:|---|---|---|---|",
+)
+EMPTY_CELLS = "— | — |"
+
+
+def markdown_text(value: str) -> str:
+    """Escape a contributor-supplied string so it cannot break out of a table cell."""
+    return value.replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
+
+
+def contributor(record: dict[str, Any]) -> str:
+    return (
+        f"{markdown_text(record['contributor_name'])} "
+        f"(@{markdown_text(record['github_handle'])})"
+    )
+
+
+def specs(record: dict[str, Any]) -> str:
+    """Render the reported hardware, e.g. `1 x 8 vCPU / 32 GiB, Ryzen 7950X, us-west`."""
+    shape = (
+        f"{record['node_count']} x {record['vcpu_per_node']} vCPU / "
+        f"{record['ram_gib_per_node']} GiB"
+    )
+    return f"{shape}, {markdown_text(record['compute_and_network'])}"
+
 
 def report_link(path: Path, record: dict[str, Any]) -> str:
-    label = (
-        f"{record['tool']} {record['tool_version']} "
-        f"({record['contributor_name']}, @{record['github_handle']})"
-    )
+    label = f"{markdown_text(record['tool'])} {markdown_text(record['tool_version'])}"
     return f"[{label}]({path.with_suffix('.md').as_posix()})"
 
 
@@ -30,6 +63,14 @@ def format_duration(milliseconds: float) -> str:
     if milliseconds < 1_000:
         return f"{milliseconds:g} ms"
     return f"{milliseconds / 1_000:g} s"
+
+
+def leader_row(query: str, metric: str, leader: tuple[Path, dict[str, Any], Any]) -> str:
+    path, record, _ = leader
+    return (
+        f"| `{query}` | {metric} | {contributor(record)} | {specs(record)} | "
+        f"{report_link(path, record)} | {code_link(record)} |"
+    )
 
 
 def leaders_for_query(
@@ -71,10 +112,10 @@ def build_leaderboard() -> list[str]:
     lines = [
         "# Community Runtime Leaderboard",
         "",
-        "> Results are contributor-reported, not controlled benchmarks. Report links identify "
-        "the contributor and link their public GitHub code repository, with hardware, network, "
-        "cache state, table state, and query translation details.",
-        "",
+        "> Results are contributor-reported, not controlled benchmarks. Each row names the "
+        "contributor, the hardware they reported, and the public repository holding their "
+        "code; the linked report adds network, cache state, table state, and query "
+        "translation details.",
     ]
     for execution_class, title in (
         ("single_node", "Single-node engines (max: 8 vCPU / 32 GiB RAM)"),
@@ -82,23 +123,21 @@ def build_leaderboard() -> list[str]:
     ):
         lines.extend(["", f"## {title}"])
         for cache_state, heading in (("cold", "Fastest cold runs"), ("warm", "Fastest warm runs")):
-            lines.extend(["", f"### {heading}", "", "| Query | Runtime | Tool / report | Code |", "|---|---:|---|---|"])
+            lines.extend(["", f"### {heading}", "", *RUNTIME_HEADER])
             for query in QUERY_NAMES:
                 leader = leaders_for_query(records, query, cache_state, execution_class)
                 lines.append(
-                    f"| `{query}` | {format_duration(leader[2]['runtime_ms'])} | "
-                    f"{report_link(leader[0], leader[1])} | {code_link(leader[1])} |"
+                    leader_row(query, format_duration(leader[2]["runtime_ms"]), leader)
                     if leader
-                    else f"| `{query}` | — | No submitted {cache_state} run | — |"
+                    else f"| `{query}` | — | {EMPTY_CELLS} No submitted {cache_state} run | — |"
                 )
-        lines.extend(["", "### Lowest reported bytes read", "", "| Query | Bytes read | Tool / report | Code |", "|---|---:|---|---|"])
+        lines.extend(["", "### Lowest reported bytes read", "", *BYTES_HEADER])
         for query in QUERY_NAMES:
             leader = bytes_leader(records, query, execution_class)
             lines.append(
-                f"| `{query}` | {leader[2]['bytes_scanned']:,} | "
-                f"{report_link(leader[0], leader[1])} | {code_link(leader[1])} |"
+                leader_row(query, f"{leader[2]['bytes_scanned']:,}", leader)
                 if leader
-                else f"| `{query}` | — | No submitted scan metric | — |"
+                else f"| `{query}` | — | {EMPTY_CELLS} No submitted scan metric | — |"
             )
         complete = [
             (path, record)
@@ -109,8 +148,8 @@ def build_leaderboard() -> list[str]:
         lines.extend(["", "### Completed all five queries", ""])
         if complete:
             lines.extend(
-                f"- {report_link(path, record)} — {code_link(record)}, "
-                f"{record['cache_state']} cache, community-reported"
+                f"- {contributor(record)} — {specs(record)} — {report_link(path, record)} — "
+                f"{code_link(record)}, {record['cache_state']} cache, community-reported"
                 for path, record in complete
             )
         else:
@@ -120,6 +159,7 @@ def build_leaderboard() -> list[str]:
 
 
 def update_readme(leaderboard_lines: list[str]) -> None:
+    """Mirror the leaderboard into README.md, demoting headings one level."""
     readme = README_PATH.read_text()
     start = readme.find(README_START_MARKER)
     end = readme.find(README_END_MARKER)
@@ -142,6 +182,7 @@ def main() -> None:
     leaderboard_lines = build_leaderboard()
     LEADERBOARD_PATH.write_text("\n".join(leaderboard_lines))
     update_readme(leaderboard_lines)
+    print(f"Wrote {LEADERBOARD_PATH} and refreshed the {README_PATH} leaderboard block.")
 
 
 if __name__ == "__main__":

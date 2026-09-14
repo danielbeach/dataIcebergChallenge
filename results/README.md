@@ -1,9 +1,9 @@
 # Submitted runtime results
 
-Each directory contains a contributor's reproducible runtime report. Reports
-are intentionally kept as small Markdown files rather than collected into a
-single benchmark table: a result is only meaningful alongside its engine,
-hardware, network, cache state, table version, and query translation.
+Each directory holds one contributor's reproducible runtime report. Reports stay
+as small Markdown files rather than one collected benchmark table: a result is
+only meaningful alongside its engine, hardware, network, cache state, table
+version, and query translation.
 
 To submit, copy both `TEMPLATE.md` and `TEMPLATE.json` into a directory named
 for your GitHub handle, using the same basename:
@@ -14,25 +14,38 @@ results/<your-github-handle>/<tool>-<version>.json
 ```
 
 For example, `results/octocat/datafusion-45.0.md` and
-`results/octocat/datafusion-45.0.json`. The JSON is machine-validated and
-generates `LEADERBOARD.md`; the Markdown explains the result to readers. Every
-record must identify the contributor by display name and GitHub handle and link
-to a public GitHub repository containing the runnable code. Add one row and one
-JSON result object for each challenge query. You may submit a partial report,
-but mark unrun queries as `not run`; do not omit them.
+`results/octocat/datafusion-45.0.json`.
+
+The JSON is machine-validated and generates the leaderboard; the Markdown
+explains the result to readers. Every record must identify the contributor by
+display name and GitHub handle, state its hardware specs, and link a public
+GitHub repository containing the runnable code — all three appear as leaderboard
+columns. Add one row and one JSON result object for each challenge query. Partial
+reports are fine, but mark unrun queries `not_run` rather than omitting them.
+
+Before opening the PR, from the repository root:
+
+```bash
+uv run python scripts/validate_results.py
+uv run python scripts/generate_leaderboard.py
+```
+
+Commit the regenerated `LEADERBOARD.md` and `README.md` alongside your report.
 
 ## Resource classes
 
 Choose exactly one class and record the actual `node_count`, `vcpu_per_node`,
-and `ram_gib_per_node` in the JSON record.
+and `ram_gib_per_node` in the JSON record. `compute_and_network` carries the CPU
+model and general location; it is shown next to the node shape on the
+leaderboard.
 
 | Class | Eligibility |
 |---|---|
 | `single_node` | Exactly one node, at most 8 vCPU and 32 GiB RAM |
 | `distributed` | 2–4 nodes, each at most 8 vCPU and 32 GiB RAM |
 
-The leaderboard rejects records above these limits. A local multi-process
-engine still belongs in `single_node` when it uses one machine.
+Validation rejects records above these limits. A local multi-process engine still
+belongs in `single_node` when it uses one machine.
 
 Do not commit downloaded data, query profiles containing credentials, access
 keys, or tokens.
