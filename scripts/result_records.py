@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from datetime import date
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +38,55 @@ REQUIRED_TOP_LEVEL_FIELDS = {
     "sql_changes",
     "results",
 }
+TEMPLATE_JSON_NAME = "TEMPLATE.json"
+TEMPLATE_MARKDOWN_NAME = "TEMPLATE.md"
+PLACEHOLDER_PATTERN = re.compile(r"^<.*>$", re.DOTALL)
+GITHUB_HANDLE_PATTERN = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$")
+REPOSITORY_URL_PATTERN = re.compile(r"^https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/?$")
+MINIMUM_REPORT_CHARACTERS = 400
+
+
+@lru_cache(maxsize=None)
+def _template_directory(start: Path) -> Path | None:
+    """Find the directory holding TEMPLATE.json, walking up from a record's directory."""
+    for candidate in (start, *start.parents):
+        if (candidate / TEMPLATE_JSON_NAME).is_file():
+            return candidate
+    return None
+
+
+@lru_cache(maxsize=None)
+def _placeholder_values(template_directory: Path) -> frozenset[str]:
+    """Collect every `<...>` string in TEMPLATE.json, at any depth."""
+
+    def walk(node: Any) -> list[str]:
+        if isinstance(node, str):
+            return [node] if PLACEHOLDER_PATTERN.match(node) else []
+        if isinstance(node, dict):
+            return [value for child in node.values() for value in walk(child)]
+        if isinstance(node, list):
+            return [value for child in node for value in walk(child)]
+        return []
+
+    template = json.loads((template_directory / TEMPLATE_JSON_NAME).read_text())
+    return frozenset(walk(template))
+
+
+def _unfilled_placeholders(record: dict[str, Any], placeholders: frozenset[str]) -> list[str]:
+    """Report every field left at its TEMPLATE.json placeholder value."""
+    unfilled = [
+        field
+        for field, value in record.items()
+        if isinstance(value, str) and value in placeholders
+    ]
+    for index, result in enumerate(record.get("results", [])):
+        if isinstance(result, dict):
+            unfilled.extend(
+                f"results[{index}].{field}"
+                for field, value in result.items()
+                if isinstance(value, str) and value in placeholders
+            )
+    return sorted(unfilled)
 
 
 def submitted_records(results_directory: Path) -> list[Path]:
@@ -95,9 +146,44 @@ def load_and_validate(path: Path) -> dict[str, Any]:
     if record["vcpu_per_node"] > 8 or record["ram_gib_per_node"] > 32:
         raise ValueError(f"{path}: each node is limited to 8 vCPU and 32 GiB RAM")
 
+    if not GITHUB_HANDLE_PATTERN.match(record["github_handle"]):
+        raise ValueError(f"{path}: github_handle must be a bare GitHub handle, without a leading @")
+    if not REPOSITORY_URL_PATTERN.match(repository_url):
+        raise ValueError(
+            f"{path}: code_repository_url must look like https://github.com/<owner>/<repository>"
+        )
+
+    template_directory = _template_directory(path.parent)
+    if template_directory is not None:
+        if path.parent == template_directory:
+            raise ValueError(
+                f"{path}: records live in results/<github-handle>/, not the results root"
+            )
+        if path.parent.name.lower() != record["github_handle"].lower():
+            raise ValueError(
+                f"{path}: directory name must match github_handle "
+                f"({path.parent.name!r} vs {record['github_handle']!r})"
+            )
+        unfilled = _unfilled_placeholders(record, _placeholder_values(template_directory))
+        if unfilled:
+            raise ValueError(
+                f"{path}: these fields still hold TEMPLATE.json placeholders: "
+                f"{', '.join(unfilled)}"
+            )
+
     markdown_report = path.with_suffix(".md")
     if not markdown_report.is_file():
         raise ValueError(f"{path}: matching Markdown report is required: {markdown_report}")
+    report_text = markdown_report.read_text()
+    if template_directory is not None:
+        template_markdown = template_directory / TEMPLATE_MARKDOWN_NAME
+        if template_markdown.is_file() and report_text.strip() == template_markdown.read_text().strip():
+            raise ValueError(f"{markdown_report}: report is an unedited copy of TEMPLATE.md")
+    if len(report_text.strip()) < MINIMUM_REPORT_CHARACTERS:
+        raise ValueError(
+            f"{markdown_report}: report must describe the run in at least "
+            f"{MINIMUM_REPORT_CHARACTERS} characters"
+        )
 
     results = record["results"]
     if not isinstance(results, list) or len(results) != len(QUERY_NAMES):

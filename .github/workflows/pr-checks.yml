@@ -1,0 +1,73 @@
+name: Submission checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submission:
+    name: Validate submitted results
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate result records
+        run: python scripts/validate_results.py
+
+      - name: Check submission hygiene
+        if: github.event_name == 'pull_request'
+        run: |
+          python scripts/check_submission_hygiene.py \
+            --base "origin/${{ github.base_ref }}" \
+            --head "${{ github.event.pull_request.head.sha }}"
+
+      # Contributors never run the generator. This shows them the leaderboard
+      # their record produces, without asking them to commit it.
+      - name: Preview the leaderboard this record produces
+        if: always()
+        run: |
+          python scripts/generate_leaderboard.py >/dev/null || exit 0
+          {
+            echo "## Leaderboard preview"
+            echo
+            if git diff --quiet -- LEADERBOARD.md; then
+              echo "This record does not change any leaderboard position."
+            else
+              echo "Merging this pull request updates the leaderboard as follows."
+              echo "You do not need to commit anything: it is regenerated after merge."
+              echo
+              echo '```diff'
+              git --no-pager diff --unified=1 -- LEADERBOARD.md | head -c 40000
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          git checkout -- LEADERBOARD.md README.md
+
+  runner:
+    name: Query runner smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync the environment
+        run: uv sync --frozen
+
+      - name: Reject a query file the runner cannot resolve
+        run: |
+          for query in queries/*.sql; do
+            test -s "$query" || { echo "::error::$query is empty"; exit 1; }
+          done
+          uv run python -c "import drivestats_challenge.query"

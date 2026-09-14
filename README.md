@@ -53,39 +53,39 @@ generated from the submitted JSON records — see
 [Submit your results](#submit-your-results).
 
 <!-- leaderboard:start -->
-> Results are contributor-reported, not controlled benchmarks. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
+> Results are contributor-reported, not controlled benchmarks. Each query lists its top 5 submissions. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
 
 ### Single-node engines (max: 8 vCPU / 32 GiB RAM)
 
 #### Fastest cold runs
 
-| Query | Runtime | Contributor | Specs | Tool / report | Code |
-|---|---:|---|---|---|---|
-| `01_fleet_on_a_day.sql` | 3.4047 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `02_model_mix.sql` | 3.0511 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `03_failure_rate_by_model.sql` | 20.493 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `04_smart_warning_signals.sql` | 325.012 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `05_capacity_growth.sql` | 155.359 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| Query | Rank | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | 1 | 3.4047 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `02_model_mix.sql` | 1 | 3.0511 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `03_failure_rate_by_model.sql` | 1 | 20.493 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `04_smart_warning_signals.sql` | 1 | 325.012 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `05_capacity_growth.sql` | 1 | 155.359 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
 
 #### Fastest warm runs
 
-| Query | Runtime | Contributor | Specs | Tool / report | Code |
-|---|---:|---|---|---|---|
-| `01_fleet_on_a_day.sql` | 1.8272 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `02_model_mix.sql` | 1.9386 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `03_failure_rate_by_model.sql` | 2.6401 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `04_smart_warning_signals.sql` | 8.0856 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `05_capacity_growth.sql` | 4.969 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| Query | Rank | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | 1 | 1.8272 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `02_model_mix.sql` | 1 | 1.9386 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `03_failure_rate_by_model.sql` | 1 | 2.6401 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `04_smart_warning_signals.sql` | 1 | 8.0856 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `05_capacity_growth.sql` | 1 | 4.969 s | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-warm.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
 
 #### Lowest reported bytes read
 
-| Query | Bytes read | Contributor | Specs | Tool / report | Code |
-|---|---:|---|---|---|---|
-| `01_fleet_on_a_day.sql` | 5,506,164 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `02_model_mix.sql` | 5,634,845 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `03_failure_rate_by_model.sql` | 384,310,099 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `04_smart_warning_signals.sql` | 3,511,999,629 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
-| `05_capacity_growth.sql` | 173,041,487 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| Query | Rank | Bytes read | Contributor | Specs | Tool / report | Code |
+|---|---:|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | 1 | 5,506,164 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `02_model_mix.sql` | 1 | 5,634,845 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `03_failure_rate_by_model.sql` | 1 | 384,310,099 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `04_smart_warning_signals.sql` | 1 | 3,511,999,629 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
+| `05_capacity_growth.sql` | 1 | 173,041,487 | Daniel Beach (@danielbeach) | 1 x 8 vCPU / 24 GiB, Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004 | [DuckDB 1.5.5](results/danielbeach/duckdb-1.5.5-cold.md) | [repository](https://github.com/danielbeach/dataIcebergChallenge) |
 
 #### Completed all five queries
 
@@ -96,33 +96,33 @@ generated from the submitted JSON records — see
 
 #### Fastest cold runs
 
-| Query | Runtime | Contributor | Specs | Tool / report | Code |
-|---|---:|---|---|---|---|
-| `01_fleet_on_a_day.sql` | — | — | — | No submitted cold run | — |
-| `02_model_mix.sql` | — | — | — | No submitted cold run | — |
-| `03_failure_rate_by_model.sql` | — | — | — | No submitted cold run | — |
-| `04_smart_warning_signals.sql` | — | — | — | No submitted cold run | — |
-| `05_capacity_growth.sql` | — | — | — | No submitted cold run | — |
+| Query | Rank | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | — | No submitted cold run | — |
+| `02_model_mix.sql` | — | — | — | — | No submitted cold run | — |
+| `03_failure_rate_by_model.sql` | — | — | — | — | No submitted cold run | — |
+| `04_smart_warning_signals.sql` | — | — | — | — | No submitted cold run | — |
+| `05_capacity_growth.sql` | — | — | — | — | No submitted cold run | — |
 
 #### Fastest warm runs
 
-| Query | Runtime | Contributor | Specs | Tool / report | Code |
-|---|---:|---|---|---|---|
-| `01_fleet_on_a_day.sql` | — | — | — | No submitted warm run | — |
-| `02_model_mix.sql` | — | — | — | No submitted warm run | — |
-| `03_failure_rate_by_model.sql` | — | — | — | No submitted warm run | — |
-| `04_smart_warning_signals.sql` | — | — | — | No submitted warm run | — |
-| `05_capacity_growth.sql` | — | — | — | No submitted warm run | — |
+| Query | Rank | Runtime | Contributor | Specs | Tool / report | Code |
+|---|---:|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | — | No submitted warm run | — |
+| `02_model_mix.sql` | — | — | — | — | No submitted warm run | — |
+| `03_failure_rate_by_model.sql` | — | — | — | — | No submitted warm run | — |
+| `04_smart_warning_signals.sql` | — | — | — | — | No submitted warm run | — |
+| `05_capacity_growth.sql` | — | — | — | — | No submitted warm run | — |
 
 #### Lowest reported bytes read
 
-| Query | Bytes read | Contributor | Specs | Tool / report | Code |
-|---|---:|---|---|---|---|
-| `01_fleet_on_a_day.sql` | — | — | — | No submitted scan metric | — |
-| `02_model_mix.sql` | — | — | — | No submitted scan metric | — |
-| `03_failure_rate_by_model.sql` | — | — | — | No submitted scan metric | — |
-| `04_smart_warning_signals.sql` | — | — | — | No submitted scan metric | — |
-| `05_capacity_growth.sql` | — | — | — | No submitted scan metric | — |
+| Query | Rank | Bytes read | Contributor | Specs | Tool / report | Code |
+|---|---:|---:|---|---|---|---|
+| `01_fleet_on_a_day.sql` | — | — | — | — | No submitted scan metric | — |
+| `02_model_mix.sql` | — | — | — | — | No submitted scan metric | — |
+| `03_failure_rate_by_model.sql` | — | — | — | — | No submitted scan metric | — |
+| `04_smart_warning_signals.sql` | — | — | — | — | No submitted scan metric | — |
+| `05_capacity_growth.sql` | — | — | — | — | No submitted scan metric | — |
 
 #### Completed all five queries
 
@@ -222,18 +222,30 @@ explains the result to readers. Every record must carry:
   them. Partial reports are welcome, but mark unrun queries `not_run` rather
   than omitting them.
 
-Validate and regenerate before opening the PR:
+**Commit only your two files.** `LEADERBOARD.md` and the leaderboard block in
+this README are generated, and
+[a workflow](.github/workflows/update-leaderboard.yml) rewrites them after your
+PR merges. A PR that also edits them is rejected, because every submission
+rewrites the same rows and hand-carried copies collide.
+
+Check your record before opening the PR:
 
 ```bash
 uv run python scripts/validate_results.py
-uv run python scripts/generate_leaderboard.py
 ```
 
-The generator rewrites `LEADERBOARD.md` and the leaderboard block in this
-README from the submitted records, so commit both. It separates single-node
-from distributed engines, then lists leaders for fastest cold run, fastest warm
-run, lowest bytes read, and completing all five queries. Records above the
-resource ceiling for their class are rejected.
+Opening the PR runs that same validation in GitHub Actions
+([`.github/workflows/pr-checks.yml`](.github/workflows/pr-checks.yml)),
+plus a hygiene scan for committed credentials, data extracts, oversized files,
+and edits to another contributor's directory. Validation rejects records that
+still hold `TEMPLATE.json` placeholders, a report that is an unedited copy of
+`TEMPLATE.md`, a directory name that does not match `github_handle`, and specs
+above the resource ceiling for their class. The PR summary shows a preview of
+the leaderboard your record produces.
+
+The generator separates single-node from distributed engines, then ranks the top
+five submissions per query for fastest cold run, fastest warm run, and lowest
+bytes read, followed by everyone who completed all five queries.
 
 Validation checks the structured JSON and requires a matching Markdown report.
 It does not run submitted code, access the Drive Stats dataset, or handle
