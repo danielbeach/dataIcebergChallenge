@@ -2,7 +2,8 @@
 
 Writes the standalone `LEADERBOARD.md` and mirrors the same tables into the
 `<!-- leaderboard:start -->` / `<!-- leaderboard:end -->` block in `README.md`,
-so the two can never drift. Each query lists its top `TOP_N` submissions.
+so the two can never drift. Each query lists its top `TOP_N` submissions, keeping
+only each contributor's best run so one person cannot hold every position.
 """
 
 from __future__ import annotations
@@ -83,44 +84,69 @@ def empty_row(query: str, reason: str) -> str:
     return f"| `{query}` | — | — | {EMPTY_CELLS} {reason} | — |"
 
 
+def rank_top(
+    candidates: list[tuple[Path, dict[str, Any], dict[str, Any]]],
+    metric: str,
+    limit: int = TOP_N,
+) -> list[tuple[Path, dict[str, Any], dict[str, Any]]]:
+    """Order by `metric`, keep each contributor's best run only, and cut to `limit`.
+
+    One row per contributor per table stops a single person who submits several
+    engines or tool versions from taking every position. The record path breaks
+    ties so the generated file is stable across runs.
+    """
+    candidates.sort(key=lambda candidate: (candidate[2][metric], candidate[0].as_posix()))
+    ranked: list[tuple[Path, dict[str, Any], dict[str, Any]]] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        handle = candidate[1]["github_handle"].lower()
+        if handle in seen:
+            continue
+        seen.add(handle)
+        ranked.append(candidate)
+        if len(ranked) == limit:
+            break
+    return ranked
+
+
 def leaders_for_query(
     records: list[tuple[Path, dict[str, Any]]],
     query: str,
     cache_state: str,
     execution_class: str,
-    limit: int = TOP_N,
 ) -> list[tuple[Path, dict[str, Any], dict[str, Any]]]:
-    """Return the fastest `limit` passing runs for one query, cache state, and class."""
-    candidates = [
-        (path, record, result)
-        for path, record in records
-        if record["cache_state"] == cache_state
-        and record["execution_class"] == execution_class
-        for result in record["results"]
-        if result["query"] == query and result["status"] == "pass"
-    ]
-    candidates.sort(key=lambda candidate: (candidate[2]["runtime_ms"], candidate[0].as_posix()))
-    return candidates[:limit]
+    """Return the fastest passing runs for one query, cache state, and execution class."""
+    return rank_top(
+        [
+            (path, record, result)
+            for path, record in records
+            if record["cache_state"] == cache_state
+            and record["execution_class"] == execution_class
+            for result in record["results"]
+            if result["query"] == query and result["status"] == "pass"
+        ],
+        "runtime_ms",
+    )
 
 
 def bytes_leaders(
     records: list[tuple[Path, dict[str, Any]]],
     query: str,
     execution_class: str,
-    limit: int = TOP_N,
 ) -> list[tuple[Path, dict[str, Any], dict[str, Any]]]:
-    """Return the `limit` smallest reported scans for one query and execution class."""
-    candidates = [
-        (path, record, result)
-        for path, record in records
-        for result in record["results"]
-        if record["execution_class"] == execution_class
-        and result["query"] == query
-        and result["status"] == "pass"
-        and result["bytes_scanned"] is not None
-    ]
-    candidates.sort(key=lambda candidate: (candidate[2]["bytes_scanned"], candidate[0].as_posix()))
-    return candidates[:limit]
+    """Return the smallest reported scans for one query and execution class."""
+    return rank_top(
+        [
+            (path, record, result)
+            for path, record in records
+            for result in record["results"]
+            if record["execution_class"] == execution_class
+            and result["query"] == query
+            and result["status"] == "pass"
+            and result["bytes_scanned"] is not None
+        ],
+        "bytes_scanned",
+    )
 
 
 def build_leaderboard() -> list[str]:
@@ -131,9 +157,10 @@ def build_leaderboard() -> list[str]:
         "# Community Runtime Leaderboard",
         "",
         f"> Results are contributor-reported, not controlled benchmarks. Each query lists its "
-        f"top {TOP_N} submissions. Each row names the contributor, the hardware they reported, "
-        "and the public repository holding their code; the linked report adds network, cache "
-        "state, table state, and query translation details.",
+        f"top {TOP_N} submissions, at most one row per contributor. Each row names the "
+        "contributor, the hardware they reported, and the public repository holding their "
+        "code; the linked report adds network, cache state, table state, and query "
+        "translation details.",
     ]
     for execution_class, title in (
         ("single_node", "Single-node engines (max: 8 vCPU / 32 GiB RAM)"),

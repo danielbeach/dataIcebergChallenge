@@ -1,6 +1,6 @@
 # Community Runtime Leaderboard
 
-> Results are contributor-reported, not controlled benchmarks. Each query lists its top 5 submissions. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
+> Results are contributor-reported, not controlled benchmarks. Each query lists its top 5 submissions, at most one row per contributor. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
 
 ## Single-node engines (max: 8 vCPU / 32 GiB RAM)
 

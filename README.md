@@ -53,7 +53,7 @@ generated from the submitted JSON records — see
 [Submit your results](#submit-your-results).
 
 <!-- leaderboard:start -->
-> Results are contributor-reported, not controlled benchmarks. Each query lists its top 5 submissions. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
+> Results are contributor-reported, not controlled benchmarks. Each query lists its top 5 submissions, at most one row per contributor. Each row names the contributor, the hardware they reported, and the public repository holding their code; the linked report adds network, cache state, table state, and query translation details.
 
 ### Single-node engines (max: 8 vCPU / 32 GiB RAM)
 
@@ -245,7 +245,9 @@ the leaderboard your record produces.
 
 The generator separates single-node from distributed engines, then ranks the top
 five submissions per query for fastest cold run, fastest warm run, and lowest
-bytes read, followed by everyone who completed all five queries.
+bytes read, followed by everyone who completed all five queries. Each table holds
+at most one row per contributor — your best run — so no single person can occupy
+every position with several engines or tool versions.
 
 Validation checks the structured JSON and requires a matching Markdown report.
 It does not run submitted code, access the Drive Stats dataset, or handle
