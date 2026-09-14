@@ -39,7 +39,8 @@
 
 All five results are value-for-value identical to my
 [DuckDB 1.5.5 cold run](duckdb-1.5.5-cold.md) against the same snapshot, which is
-the cross-check that the translations below are faithful.
+the cross-check that the translations below are faithful. The
+[warm companion run](polars-1.44.2-warm.md) uses the same runner and snapshot.
 
 ### How these numbers were measured
 
