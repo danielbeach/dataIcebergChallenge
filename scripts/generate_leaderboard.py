@@ -2,8 +2,7 @@
 
 Writes the standalone `LEADERBOARD.md` and mirrors the same tables into the
 `<!-- leaderboard:start -->` / `<!-- leaderboard:end -->` block in `README.md`,
-so the two can never drift. Each query lists its top `TOP_N` submissions, keeping
-only each contributor's best run so one person cannot hold every position.
+so the two can never drift. Each query lists its top `TOP_N` submitted runs.
 """
 
 from __future__ import annotations
@@ -89,24 +88,14 @@ def rank_top(
     metric: str,
     limit: int = TOP_N,
 ) -> list[tuple[Path, dict[str, Any], dict[str, Any]]]:
-    """Order by `metric`, keep each contributor's best run only, and cut to `limit`.
+    """Order by `metric` and cut to `limit`.
 
-    One row per contributor per table stops a single person who submits several
-    engines or tool versions from taking every position. The record path breaks
-    ties so the generated file is stable across runs.
+    Every submitted run competes on its own, so one contributor can hold several
+    positions with different engines or tool versions. The record path breaks ties
+    so the generated file is stable across runs.
     """
     candidates.sort(key=lambda candidate: (candidate[2][metric], candidate[0].as_posix()))
-    ranked: list[tuple[Path, dict[str, Any], dict[str, Any]]] = []
-    seen: set[str] = set()
-    for candidate in candidates:
-        handle = candidate[1]["github_handle"].lower()
-        if handle in seen:
-            continue
-        seen.add(handle)
-        ranked.append(candidate)
-        if len(ranked) == limit:
-            break
-    return ranked
+    return candidates[:limit]
 
 
 def leaders_for_query(
@@ -157,7 +146,7 @@ def build_leaderboard() -> list[str]:
         "# Community Runtime Leaderboard",
         "",
         f"> Results are contributor-reported, not controlled benchmarks. Each query lists its "
-        f"top {TOP_N} submissions, at most one row per contributor. Each row names the "
+        f"top {TOP_N} submitted runs. Each row names the "
         "contributor, the hardware they reported, and the public repository holding their "
         "code; the linked report adds network, cache state, table state, and query "
         "translation details.",
