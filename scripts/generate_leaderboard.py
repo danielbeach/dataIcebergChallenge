@@ -9,6 +9,9 @@ from result_records import QUERY_NAMES, load_and_validate, submitted_records
 
 RESULTS_DIRECTORY = Path("results")
 LEADERBOARD_PATH = Path("LEADERBOARD.md")
+README_PATH = Path("README.md")
+README_START_MARKER = "<!-- leaderboard:start -->"
+README_END_MARKER = "<!-- leaderboard:end -->"
 
 
 def report_link(path: Path, record: dict[str, Any]) -> str:
@@ -61,7 +64,7 @@ def bytes_leader(
     return min(candidates, key=lambda candidate: candidate[2]["bytes_scanned"]) if candidates else None
 
 
-def main() -> None:
+def build_leaderboard() -> list[str]:
     records = [
         (path, load_and_validate(path)) for path in submitted_records(RESULTS_DIRECTORY)
     ]
@@ -113,7 +116,32 @@ def main() -> None:
         else:
             lines.append("No submission has completed all five queries yet.")
     lines.append("")
-    LEADERBOARD_PATH.write_text("\n".join(lines))
+    return lines
+
+
+def update_readme(leaderboard_lines: list[str]) -> None:
+    readme = README_PATH.read_text()
+    start = readme.find(README_START_MARKER)
+    end = readme.find(README_END_MARKER)
+    if start == -1 or end == -1 or end < start:
+        raise ValueError("README.md must contain ordered leaderboard markers")
+    embedded_lines = []
+    for line in leaderboard_lines[1:]:
+        if line.startswith("### "):
+            embedded_lines.append(f"#### {line[4:]}")
+        elif line.startswith("## "):
+            embedded_lines.append(f"### {line[3:]}")
+        else:
+            embedded_lines.append(line)
+    embedded = "\n".join(embedded_lines).strip()
+    replacement = f"{README_START_MARKER}\n{embedded}\n{README_END_MARKER}"
+    README_PATH.write_text(readme[:start] + replacement + readme[end + len(README_END_MARKER):])
+
+
+def main() -> None:
+    leaderboard_lines = build_leaderboard()
+    LEADERBOARD_PATH.write_text("\n".join(leaderboard_lines))
+    update_readme(leaderboard_lines)
 
 
 if __name__ == "__main__":

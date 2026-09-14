@@ -1,5 +1,13 @@
 # Backblaze Drive Stats Iceberg Challenge
 
+**Can your data engine query a half-billion-row Iceberg table efficiently?**
+Choose your language and tool, solve five Drive Stats analytics challenges, and
+submit reproducible results to the community leaderboard.
+
+![Backblaze Drive Stats Iceberg Challenge](dec.jpg)
+
+**Sponsored by [Data Engineering Central](https://dataengineeringcentral.substack.com/).**
+
 Build a data-engineering portfolio project from Backblaze's public, read-only
 [Drive Stats](https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data)
 Iceberg table. Each row is one operational-drive snapshot for one day, including
@@ -11,6 +19,95 @@ not the implementation. Use Rust, Python, Java, Scala, Go, JavaScript,
 SQL, or another language; use DuckDB, Polars, DataFusion, PyIceberg, Trino,
 Spark, Snowflake, or any compatible tool. Reproduce the queries, then improve
 them for cost, partition pruning, schema evolution, and reproducibility.
+
+## Choose your challenge track
+
+Submit to one track only. The leaderboard does not compare these tracks because
+they have fundamentally different execution resources.
+
+| Track | Use this track when | Maximum resources |
+|---|---|---|
+| **Single-Node** | Your engine runs on one machine, including local multi-process execution. | 1 node; 8 vCPU; 32 GiB RAM |
+| **Distributed** | Your engine distributes the query across a cluster. | 2–4 nodes; each node at most 8 vCPU and 32 GiB RAM |
+
+## Current leaderboard
+
+<!-- leaderboard:start -->
+> Results are contributor-reported, not controlled benchmarks. Report links identify the contributor and link their public GitHub code repository, with hardware, network, cache state, table state, and query translation details.
+
+
+### Single-node engines (max: 8 vCPU / 32 GiB RAM)
+
+#### Fastest cold runs
+
+| Query | Runtime | Tool / report | Code |
+|---|---:|---|---|
+| `01_fleet_on_a_day.sql` | — | No submitted cold run | — |
+| `02_model_mix.sql` | — | No submitted cold run | — |
+| `03_failure_rate_by_model.sql` | — | No submitted cold run | — |
+| `04_smart_warning_signals.sql` | — | No submitted cold run | — |
+| `05_capacity_growth.sql` | — | No submitted cold run | — |
+
+#### Fastest warm runs
+
+| Query | Runtime | Tool / report | Code |
+|---|---:|---|---|
+| `01_fleet_on_a_day.sql` | — | No submitted warm run | — |
+| `02_model_mix.sql` | — | No submitted warm run | — |
+| `03_failure_rate_by_model.sql` | — | No submitted warm run | — |
+| `04_smart_warning_signals.sql` | — | No submitted warm run | — |
+| `05_capacity_growth.sql` | — | No submitted warm run | — |
+
+#### Lowest reported bytes read
+
+| Query | Bytes read | Tool / report | Code |
+|---|---:|---|---|
+| `01_fleet_on_a_day.sql` | — | No submitted scan metric | — |
+| `02_model_mix.sql` | — | No submitted scan metric | — |
+| `03_failure_rate_by_model.sql` | — | No submitted scan metric | — |
+| `04_smart_warning_signals.sql` | — | No submitted scan metric | — |
+| `05_capacity_growth.sql` | — | No submitted scan metric | — |
+
+#### Completed all five queries
+
+No submission has completed all five queries yet.
+
+### Distributed engines (max: 4 nodes; 8 vCPU / 32 GiB RAM each)
+
+#### Fastest cold runs
+
+| Query | Runtime | Tool / report | Code |
+|---|---:|---|---|
+| `01_fleet_on_a_day.sql` | — | No submitted cold run | — |
+| `02_model_mix.sql` | — | No submitted cold run | — |
+| `03_failure_rate_by_model.sql` | — | No submitted cold run | — |
+| `04_smart_warning_signals.sql` | — | No submitted cold run | — |
+| `05_capacity_growth.sql` | — | No submitted cold run | — |
+
+#### Fastest warm runs
+
+| Query | Runtime | Tool / report | Code |
+|---|---:|---|---|
+| `01_fleet_on_a_day.sql` | — | No submitted warm run | — |
+| `02_model_mix.sql` | — | No submitted warm run | — |
+| `03_failure_rate_by_model.sql` | — | No submitted warm run | — |
+| `04_smart_warning_signals.sql` | — | No submitted warm run | — |
+| `05_capacity_growth.sql` | — | No submitted warm run | — |
+
+#### Lowest reported bytes read
+
+| Query | Bytes read | Tool / report | Code |
+|---|---:|---|---|
+| `01_fleet_on_a_day.sql` | — | No submitted scan metric | — |
+| `02_model_mix.sql` | — | No submitted scan metric | — |
+| `03_failure_rate_by_model.sql` | — | No submitted scan metric | — |
+| `04_smart_warning_signals.sql` | — | No submitted scan metric | — |
+| `05_capacity_growth.sql` | — | No submitted scan metric | — |
+
+#### Completed all five queries
+
+No submission has completed all five queries yet.
+<!-- leaderboard:end -->
 
 ## Dataset facts
 
