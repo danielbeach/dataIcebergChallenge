@@ -38,7 +38,9 @@ automatically after your PR merges; a PR that edits them is rejected. The PR
 summary previews the leaderboard your record produces.
 
 Each query on the leaderboard ranks its top five submissions, separately for
-cold runs, warm runs, and lowest reported bytes read.
+cold runs, warm runs, and lowest reported bytes read. Only your best run counts
+toward each table: submitting several engines or tool versions cannot put you in
+more than one position per query.
 
 ## Resource classes
 
