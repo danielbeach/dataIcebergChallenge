@@ -6,8 +6,8 @@ Parquet footer cache.
 
 Usage::
 
-    uv run python scripts/bench_duckdb.py 01_fleet_on_a_day.sql --mode cold
-    uv run python scripts/bench_duckdb.py 01_fleet_on_a_day.sql --mode warm --repeats 3
+    uv run python results/danielbeach/bench_duckdb.py 01_fleet_on_a_day.sql --mode cold
+    uv run python results/danielbeach/bench_duckdb.py 01_fleet_on_a_day.sql --mode warm --repeats 3
 
 The ``runtime_ms`` printed is query execution only. The one-time Iceberg
 metadata resolution (creating the view) is reported separately as
@@ -29,7 +29,7 @@ from pathlib import Path
 import duckdb
 from dotenv import load_dotenv
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 QUERY_DIRECTORY = REPOSITORY_ROOT / "queries"
 TABLE_LOCATION = "s3://drivestats-iceberg/drivestats"
 DEFAULT_ENDPOINT = "https://s3.us-west-004.backblazeb2.com"

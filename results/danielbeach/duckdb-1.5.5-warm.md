@@ -18,7 +18,7 @@ one covers what caching changes.
 ## Connection and implementation
 
 - **Iceberg access approach:** DuckDB `iceberg_scan()` directly against `s3://drivestats-iceberg/drivestats` with `unsafe_enable_version_guessing` for metadata discovery.
-- **Exact command:** `uv run python scripts/bench_duckdb.py <query>.sql --mode warm --repeats 3` (`--repeats 2` for queries 4 and 5)
+- **Exact command:** `uv run python results/danielbeach/bench_duckdb.py <query>.sql --mode warm --repeats 3` (`--repeats 2` for queries 4 and 5)
 - **SQL changes:** none. The five files in `queries/` were executed verbatim.
 - **Date range read:** `01`/`02` read 2024-12-31; `03` reads 2024-01-01 through 2024-12-31; `04` and `05` read the full history, 2013-04 through 2026-06.
 

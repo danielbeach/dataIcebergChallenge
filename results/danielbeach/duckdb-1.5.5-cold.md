@@ -14,7 +14,7 @@
 ## Connection and implementation
 
 - **Iceberg access approach:** DuckDB `iceberg_scan()` directly against `s3://drivestats-iceberg/drivestats` with `unsafe_enable_version_guessing` for metadata discovery. No catalog, no local copy of the table.
-- **Exact command:** `uv run python scripts/bench_duckdb.py <query>.sql --mode cold`
+- **Exact command:** `uv run python results/danielbeach/bench_duckdb.py <query>.sql --mode cold`
 - **SQL changes:** none. The five files in `queries/` were executed verbatim.
 - **Date range read:** `01`/`02` read 2024-12-31; `03` reads 2024-01-01 through 2024-12-31; `04` and `05` read the full history, 2013-04 through 2026-06.
 

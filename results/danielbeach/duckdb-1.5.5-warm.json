@@ -14,7 +14,7 @@
   "compute_and_network": "Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004",
   "table_state": "Latest as of run date: snapshot 8298869781046488555, sequence number 231, committed 2026-09-02T16:26:43Z; 627 data files across 159 monthly partitions, 744,525,690 records",
   "cache_state": "warm",
-  "command": "uv run python scripts/bench_duckdb.py <query>.sql --mode warm --repeats 3",
+  "command": "uv run python results/danielbeach/bench_duckdb.py <query>.sql --mode warm --repeats 3",
   "date_range": "01 and 02: 2024-12-31. 03: 2024-01-01 through 2024-12-31. 04 and 05: full table history, 2013-04 through 2026-06.",
   "sql_changes": "None. The five files in queries/ were executed verbatim; the queries are already DuckDB dialect.",
   "results": [
