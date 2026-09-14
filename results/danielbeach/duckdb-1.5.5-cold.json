@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contributor_name": "Daniel Beach",
+  "github_handle": "danielbeach",
+  "code_repository_url": "https://github.com/danielbeach/dataIcebergChallenge",
+  "run_date_utc": "2026-09-14",
+  "language": "Python 3.12.12",
+  "tool": "DuckDB",
+  "tool_version": "1.5.5",
+  "execution_class": "single_node",
+  "node_count": 1,
+  "vcpu_per_node": 8,
+  "ram_gib_per_node": 24,
+  "compute_and_network": "Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004",
+  "table_state": "Latest as of run date: snapshot 8298869781046488555, sequence number 231, committed 2026-09-02T16:26:43Z; 627 data files across 159 monthly partitions, 744,525,690 records",
+  "cache_state": "cold",
+  "command": "uv run python results/danielbeach/bench_duckdb.py <query>.sql --mode cold",
+  "date_range": "01 and 02: 2024-12-31. 03: 2024-01-01 through 2024-12-31. 04 and 05: full table history, 2013-04 through 2026-06.",
+  "sql_changes": "None. The five files in queries/ were executed verbatim; the queries are already DuckDB dialect.",
+  "results": [
+    {
+      "query": "01_fleet_on_a_day.sql",
+      "status": "pass",
+      "runtime_ms": 3404.7,
+      "bytes_scanned": 5506164,
+      "files_scanned": 1,
+      "result_evidence": "1 row: 2024-12-31, 305180 active drives, 4.42 raw exabytes",
+      "notes": "Bytes are 375,070 of Parquet from the single date_month=2024-12 data file plus 5,131,094 of Iceberg metadata across 26 metadata/manifest objects. Runtime excludes a 6,240 ms one-time Iceberg metadata resolution (view creation)."
+    },
+    {
+      "query": "02_model_mix.sql",
+      "status": "pass",
+      "runtime_ms": 3051.1,
+      "bytes_scanned": 5634845,
+      "files_scanned": 1,
+      "result_evidence": "15 rows; top model TOSHIBA MG08ACA16TA with 40185 drives (13.17%), 15th TOSHIBA MG08ACA16TE with 5912 drives (1.94%)",
+      "notes": "Bytes are 503,751 of Parquet from the single date_month=2024-12 data file plus 5,131,094 of Iceberg metadata. Runtime excludes a 4,424 ms one-time Iceberg metadata resolution."
+    },
+    {
+      "query": "03_failure_rate_by_model.sql",
+      "status": "pass",
+      "runtime_ms": 20493.0,
+      "bytes_scanned": 384310099,
+      "files_scanned": 12,
+      "result_evidence": "20 rows; highest annualized failure rate ST12000NM0007 at 11.387% (1169 drives, 125 failures), lowest of the 20 TOSHIBA MG08ACA16TE at 1.143%",
+      "notes": "Bytes are 379,179,005 of Parquet across the 12 monthly partitions of 2024 plus 5,131,094 of Iceberg metadata. serial_number dominates the read. Runtime excludes a 4,746 ms one-time Iceberg metadata resolution."
+    },
+    {
+      "query": "04_smart_warning_signals.sql",
+      "status": "pass",
+      "runtime_ms": 325012.3,
+      "bytes_scanned": 3511999629,
+      "files_scanned": 627,
+      "result_evidence": "20 rows; highest avg pending sectors WDC WD1600BPVT at 16484.5 over 119 observations, ST14000NM0138 second at 4963.5 over 13765 observations",
+      "notes": "Whole-history query: the failed_drives CTE and the main scan each read every partition, so the table is scanned twice. Bytes are 3,506,868,535 of Parquet plus 5,131,094 of Iceberg metadata. Runtime excludes a 6,297 ms one-time Iceberg metadata resolution."
+    },
+    {
+      "query": "05_capacity_growth.sql",
+      "status": "pass",
+      "runtime_ms": 155359.0,
+      "bytes_scanned": 173041487,
+      "files_scanned": 627,
+      "result_evidence": "159 rows, one per month-end from 2013-04-30 to 2026-06-30; first row 21734 drives / 0.06 EB / 0.0% at least 16 TB, last row 355238 drives / 5.71 EB / 60.18% at least 16 TB",
+      "notes": "Whole-history query, but only date and capacity_bytes are projected: 167,910,393 of Parquet plus 5,131,094 of Iceberg metadata. Wall time is dominated by per-file request latency over 627 remote files rather than bandwidth. Runtime excludes a 5,406 ms one-time Iceberg metadata resolution."
+    }
+  ]
+}

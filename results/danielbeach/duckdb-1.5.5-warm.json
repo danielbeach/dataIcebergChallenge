@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contributor_name": "Daniel Beach",
+  "github_handle": "danielbeach",
+  "code_repository_url": "https://github.com/danielbeach/dataIcebergChallenge",
+  "run_date_utc": "2026-09-14",
+  "language": "Python 3.12.12",
+  "tool": "DuckDB",
+  "tool_version": "1.5.5",
+  "execution_class": "single_node",
+  "node_count": 1,
+  "vcpu_per_node": 8,
+  "ram_gib_per_node": 24,
+  "compute_and_network": "Apple M4 Pro (14 cores; DuckDB pinned to threads=8, memory_limit=24GB), macOS 26.6.2, US Central (America/Chicago) over the public internet to Backblaze B2 us-west-004",
+  "table_state": "Latest as of run date: snapshot 8298869781046488555, sequence number 231, committed 2026-09-02T16:26:43Z; 627 data files across 159 monthly partitions, 744,525,690 records",
+  "cache_state": "warm",
+  "command": "uv run python results/danielbeach/bench_duckdb.py <query>.sql --mode warm --repeats 3",
+  "date_range": "01 and 02: 2024-12-31. 03: 2024-01-01 through 2024-12-31. 04 and 05: full table history, 2013-04 through 2026-06.",
+  "sql_changes": "None. The five files in queries/ were executed verbatim; the queries are already DuckDB dialect.",
+  "results": [
+    {
+      "query": "01_fleet_on_a_day.sql",
+      "status": "pass",
+      "runtime_ms": 1827.2,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "1 row: 2024-12-31, 305180 active drives, 4.42 raw exabytes",
+      "notes": "Fastest of 3 executions after one discarded priming run in the same process; samples 1917.9 / 2027.4 / 1827.2 ms. Byte counters are omitted for warm runs because the column chunks are served from DuckDB's in-process external file cache, so they measure cache hits rather than object-store reads."
+    },
+    {
+      "query": "02_model_mix.sql",
+      "status": "pass",
+      "runtime_ms": 1938.6,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "15 rows; top model TOSHIBA MG08ACA16TA with 40185 drives (13.17%), 15th TOSHIBA MG08ACA16TE with 5912 drives (1.94%)",
+      "notes": "Fastest of 3 executions after one discarded priming run; samples 1951.2 / 1938.6 / 2172.8 ms."
+    },
+    {
+      "query": "03_failure_rate_by_model.sql",
+      "status": "pass",
+      "runtime_ms": 2640.1,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "20 rows; highest annualized failure rate ST12000NM0007 at 11.387% (1169 drives, 125 failures), lowest of the 20 TOSHIBA MG08ACA16TE at 1.143%",
+      "notes": "Fastest of 3 executions after one discarded priming run; samples 2711.0 / 2640.1 / 2796.6 ms. 7.8x faster than the cold run: the 379 MB of 2024 column chunks fit in the external file cache."
+    },
+    {
+      "query": "04_smart_warning_signals.sql",
+      "status": "pass",
+      "runtime_ms": 8085.6,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "20 rows; highest avg pending sectors WDC WD1600BPVT at 16484.5 over 119 observations, ST14000NM0138 second at 4963.5 over 13765 observations",
+      "notes": "Fastest of 2 executions after one discarded priming run; samples 8089.9 / 8085.6 ms. 40x faster than the cold run: all 3.5 GB of projected column chunks stay resident in the 24 GiB external file cache with no eviction."
+    },
+    {
+      "query": "05_capacity_growth.sql",
+      "status": "pass",
+      "runtime_ms": 4969.0,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "159 rows, one per month-end from 2013-04-30 to 2026-06-30; first row 21734 drives / 0.06 EB / 0.0% at least 16 TB, last row 355238 drives / 5.71 EB / 60.18% at least 16 TB",
+      "notes": "Fastest of 2 executions after one discarded priming run; samples 4969.0 / 5191.1 ms. 31x faster than the cold run, confirming that the cold number is dominated by per-file request latency across 627 remote files."
+    }
+  ]
+}
