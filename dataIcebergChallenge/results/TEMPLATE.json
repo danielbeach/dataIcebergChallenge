@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contributor_name": "<display name>",
+  "github_handle": "<github-handle>",
+  "code_repository_url": "https://github.com/<owner>/<repository>",
+  "run_date_utc": "YYYY-MM-DD",
+  "language": "<for example, Rust 1.XX>",
+  "tool": "<for example, Apache DataFusion>",
+  "tool_version": "<version>",
+  "execution_class": "single_node",
+  "node_count": 1,
+  "vcpu_per_node": 8,
+  "ram_gib_per_node": 32,
+  "compute_and_network": "<CPU model, cloud region or general location>",
+  "table_state": "<snapshot ID, metadata file, or latest as of run date>",
+  "cache_state": "cold",
+  "command": "<command; no credentials>",
+  "date_range": "<for example, 2024-01-01 through 2024-12-31>",
+  "sql_changes": "<none, or explain dialect-specific changes>",
+  "results": [
+    {
+      "query": "01_fleet_on_a_day.sql",
+      "status": "pass",
+      "runtime_ms": 0,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "<row count or result values>",
+      "notes": ""
+    },
+    {
+      "query": "02_model_mix.sql",
+      "status": "not_run",
+      "runtime_ms": null,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "",
+      "notes": ""
+    },
+    {
+      "query": "03_failure_rate_by_model.sql",
+      "status": "not_run",
+      "runtime_ms": null,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "",
+      "notes": ""
+    },
+    {
+      "query": "04_smart_warning_signals.sql",
+      "status": "not_run",
+      "runtime_ms": null,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "",
+      "notes": ""
+    },
+    {
+      "query": "05_capacity_growth.sql",
+      "status": "not_run",
+      "runtime_ms": null,
+      "bytes_scanned": null,
+      "files_scanned": null,
+      "result_evidence": "",
+      "notes": ""
+    }
+  ]
+}
