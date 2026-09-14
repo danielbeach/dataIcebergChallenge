@@ -1,0 +1,45 @@
+name: Update leaderboard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'results/**'
+      - 'scripts/generate_leaderboard.py'
+      - 'scripts/result_records.py'
+  workflow_dispatch:
+
+# This workflow is the only writer of LEADERBOARD.md and the README leaderboard
+# block. If main is protected, GITHUB_TOKEN pushes are rejected: either allow
+# this workflow to bypass the rule, or swap the push for a pull request.
+permissions:
+  contents: write
+
+concurrency:
+  group: update-leaderboard
+  cancel-in-progress: false
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Regenerate the leaderboard
+        run: python scripts/generate_leaderboard.py
+
+      - name: Commit any drift
+        run: |
+          if git diff --quiet -- LEADERBOARD.md README.md; then
+            echo "Leaderboard already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add LEADERBOARD.md README.md
+          git commit -m "Regenerate leaderboard from submitted records"
+          git push

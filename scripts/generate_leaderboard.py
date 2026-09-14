@@ -2,7 +2,7 @@
 
 Writes the standalone `LEADERBOARD.md` and mirrors the same tables into the
 `<!-- leaderboard:start -->` / `<!-- leaderboard:end -->` block in `README.md`,
-so the two can never drift.
+so the two can never drift. Each query lists its top `TOP_N` submissions.
 """
 
 from __future__ import annotations
@@ -18,13 +18,15 @@ README_PATH = Path("README.md")
 README_START_MARKER = "<!-- leaderboard:start -->"
 README_END_MARKER = "<!-- leaderboard:end -->"
 
+TOP_N = 5
+
 RUNTIME_HEADER = (
-    "| Query | Runtime | Contributor | Specs | Tool / report | Code |",
-    "|---|---:|---|---|---|---|",
+    "| Query | Rank | Runtime | Contributor | Specs | Tool / report | Code |",
+    "|---|---:|---:|---|---|---|---|",
 )
 BYTES_HEADER = (
-    "| Query | Bytes read | Contributor | Specs | Tool / report | Code |",
-    "|---|---:|---|---|---|---|",
+    "| Query | Rank | Bytes read | Contributor | Specs | Tool / report | Code |",
+    "|---|---:|---:|---|---|---|---|",
 )
 EMPTY_CELLS = "— | — |"
 
@@ -65,12 +67,20 @@ def format_duration(milliseconds: float) -> str:
     return f"{milliseconds / 1_000:g} s"
 
 
-def leader_row(query: str, metric: str, leader: tuple[Path, dict[str, Any], Any]) -> str:
+def leader_row(
+    query: str, rank: int, metric: str, leader: tuple[Path, dict[str, Any], Any]
+) -> str:
+    """Render one ranked row; the query cell is filled only on the first row of its group."""
     path, record, _ = leader
+    query_cell = f"`{query}`" if rank == 1 else ""
     return (
-        f"| `{query}` | {metric} | {contributor(record)} | {specs(record)} | "
+        f"| {query_cell} | {rank} | {metric} | {contributor(record)} | {specs(record)} | "
         f"{report_link(path, record)} | {code_link(record)} |"
     )
+
+
+def empty_row(query: str, reason: str) -> str:
+    return f"| `{query}` | — | — | {EMPTY_CELLS} {reason} | — |"
 
 
 def leaders_for_query(
@@ -78,7 +88,9 @@ def leaders_for_query(
     query: str,
     cache_state: str,
     execution_class: str,
-) -> tuple[Path, dict[str, Any], dict[str, Any]] | None:
+    limit: int = TOP_N,
+) -> list[tuple[Path, dict[str, Any], dict[str, Any]]]:
+    """Return the fastest `limit` passing runs for one query, cache state, and class."""
     candidates = [
         (path, record, result)
         for path, record in records
@@ -87,12 +99,17 @@ def leaders_for_query(
         for result in record["results"]
         if result["query"] == query and result["status"] == "pass"
     ]
-    return min(candidates, key=lambda candidate: candidate[2]["runtime_ms"]) if candidates else None
+    candidates.sort(key=lambda candidate: (candidate[2]["runtime_ms"], candidate[0].as_posix()))
+    return candidates[:limit]
 
 
-def bytes_leader(
-    records: list[tuple[Path, dict[str, Any]]], query: str, execution_class: str
-) -> tuple[Path, dict[str, Any], dict[str, Any]] | None:
+def bytes_leaders(
+    records: list[tuple[Path, dict[str, Any]]],
+    query: str,
+    execution_class: str,
+    limit: int = TOP_N,
+) -> list[tuple[Path, dict[str, Any], dict[str, Any]]]:
+    """Return the `limit` smallest reported scans for one query and execution class."""
     candidates = [
         (path, record, result)
         for path, record in records
@@ -102,7 +119,8 @@ def bytes_leader(
         and result["status"] == "pass"
         and result["bytes_scanned"] is not None
     ]
-    return min(candidates, key=lambda candidate: candidate[2]["bytes_scanned"]) if candidates else None
+    candidates.sort(key=lambda candidate: (candidate[2]["bytes_scanned"], candidate[0].as_posix()))
+    return candidates[:limit]
 
 
 def build_leaderboard() -> list[str]:
@@ -112,10 +130,10 @@ def build_leaderboard() -> list[str]:
     lines = [
         "# Community Runtime Leaderboard",
         "",
-        "> Results are contributor-reported, not controlled benchmarks. Each row names the "
-        "contributor, the hardware they reported, and the public repository holding their "
-        "code; the linked report adds network, cache state, table state, and query "
-        "translation details.",
+        f"> Results are contributor-reported, not controlled benchmarks. Each query lists its "
+        f"top {TOP_N} submissions. Each row names the contributor, the hardware they reported, "
+        "and the public repository holding their code; the linked report adds network, cache "
+        "state, table state, and query translation details.",
     ]
     for execution_class, title in (
         ("single_node", "Single-node engines (max: 8 vCPU / 32 GiB RAM)"),
@@ -125,20 +143,24 @@ def build_leaderboard() -> list[str]:
         for cache_state, heading in (("cold", "Fastest cold runs"), ("warm", "Fastest warm runs")):
             lines.extend(["", f"### {heading}", "", *RUNTIME_HEADER])
             for query in QUERY_NAMES:
-                leader = leaders_for_query(records, query, cache_state, execution_class)
-                lines.append(
-                    leader_row(query, format_duration(leader[2]["runtime_ms"]), leader)
-                    if leader
-                    else f"| `{query}` | — | {EMPTY_CELLS} No submitted {cache_state} run | — |"
-                )
+                leaders = leaders_for_query(records, query, cache_state, execution_class)
+                if leaders:
+                    lines.extend(
+                        leader_row(query, rank, format_duration(leader[2]["runtime_ms"]), leader)
+                        for rank, leader in enumerate(leaders, start=1)
+                    )
+                else:
+                    lines.append(empty_row(query, f"No submitted {cache_state} run"))
         lines.extend(["", "### Lowest reported bytes read", "", *BYTES_HEADER])
         for query in QUERY_NAMES:
-            leader = bytes_leader(records, query, execution_class)
-            lines.append(
-                leader_row(query, f"{leader[2]['bytes_scanned']:,}", leader)
-                if leader
-                else f"| `{query}` | — | {EMPTY_CELLS} No submitted scan metric | — |"
-            )
+            leaders = bytes_leaders(records, query, execution_class)
+            if leaders:
+                lines.extend(
+                    leader_row(query, rank, f"{leader[2]['bytes_scanned']:,}", leader)
+                    for rank, leader in enumerate(leaders, start=1)
+                )
+            else:
+                lines.append(empty_row(query, "No submitted scan metric"))
         complete = [
             (path, record)
             for path, record in records

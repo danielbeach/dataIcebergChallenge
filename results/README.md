@@ -17,7 +17,10 @@ For example, `results/octocat/datafusion-45.0.md` and
 `results/octocat/datafusion-45.0.json`.
 
 The JSON is machine-validated and generates the leaderboard; the Markdown
-explains the result to readers. Every record must identify the contributor by
+explains the result to readers. Validation rejects a record whose directory name
+does not match its `github_handle`, whose fields still hold `TEMPLATE.json`
+placeholders such as `<display name>`, or whose report is an unedited copy of
+`TEMPLATE.md`. Every record must identify the contributor by
 display name and GitHub handle, state its hardware specs, and link a public
 GitHub repository containing the runnable code — all three appear as leaderboard
 columns. Add one row and one JSON result object for each challenge query. Partial
@@ -27,10 +30,15 @@ Before opening the PR, from the repository root:
 
 ```bash
 uv run python scripts/validate_results.py
-uv run python scripts/generate_leaderboard.py
 ```
 
-Commit the regenerated `LEADERBOARD.md` and `README.md` alongside your report.
+Commit only the two files in your own directory. `LEADERBOARD.md` and the
+leaderboard block in the top-level `README.md` are generated and rewritten
+automatically after your PR merges; a PR that edits them is rejected. The PR
+summary previews the leaderboard your record produces.
+
+Each query on the leaderboard ranks its top five submissions, separately for
+cold runs, warm runs, and lowest reported bytes read.
 
 ## Resource classes
 
